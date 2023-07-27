@@ -1,7 +1,7 @@
 package NeoHashMap;
 
 import NeoHashMap.Exception.IncompatibleKeyTypeException;
-import NeoHashMap.Nodes.KeyNode;
+import NeoHashMap.Nodes.AbstractKeyNode;
 
 import java.util.ArrayList;
 
@@ -22,7 +22,7 @@ public class NeoHashMap<K, V> {
     /**
      * Values of the hashmap
      */
-    private ArrayList<KeyNode<K, V>> nodes;
+    private ArrayList<AbstractKeyNode<K, V>> nodes;
 
     private NeoHashMapSettings settings;
     /**
@@ -35,7 +35,7 @@ public class NeoHashMap<K, V> {
     public NeoHashMap(){
         this(new NeoHashMapSettings());
         keys = new ArrayList<K>();
-        nodes = new ArrayList<KeyNode<K, V>>();
+        nodes = new ArrayList<AbstractKeyNode<K, V>>();
     }
 
     /**
@@ -89,8 +89,8 @@ public class NeoHashMap<K, V> {
      */
     public ArrayList<V> getValues() {
         ArrayList<V> result = new ArrayList<V>();
-        for (KeyNode<K, V> node : nodes) {
-            // @TODO result.addAll(node.getValues());
+        for (AbstractKeyNode<K, V> node : nodes) {
+            result.addAll(node.getValues());
         }
         return result;
     }

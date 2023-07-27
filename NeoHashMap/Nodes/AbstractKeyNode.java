@@ -81,5 +81,5 @@ public abstract class AbstractKeyNode<K, V>{
         this.parent = parent;
     }
 
-    abstract ArrayList<V> getValues();
+    public abstract ArrayList<V> getValues();
 }

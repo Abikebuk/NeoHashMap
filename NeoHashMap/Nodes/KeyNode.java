@@ -49,12 +49,11 @@ public class KeyNode<K, V> extends AbstractKeyNode<K, V> {
      * Common Getters & Setters
      */
     /**
-     * @TODO
      * Return all the values in the node tree left first.
      * @return all the values in the node tree (including this node)
      */
     @Override
-    ArrayList<V> getValues() {
+    public ArrayList<V> getValues() {
         ArrayList<V> result = new ArrayList<V>();
         for(AbstractKeyNode child : children){
             result.addAll(child.getValues());

@@ -49,7 +49,7 @@ public class LeafKeyNode<K, V> extends AbstractKeyNode<K, V> {
      * @return all the values in the value node (can be multiple if there is overflow)
      */
     @Override
-    ArrayList<V> getValues() {
+    public ArrayList<V> getValues() {
         return valueNode.getValues();
     }
 }
