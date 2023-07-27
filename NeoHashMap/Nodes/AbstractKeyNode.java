@@ -81,5 +81,9 @@ public abstract class AbstractKeyNode<K, V>{
         this.parent = parent;
     }
 
+    /**
+     * Return all the values in the node tree left first.
+     * @return all the values in the value node (can be multiple if there is overflow)
+     */
     public abstract ArrayList<V> getValues();
 }

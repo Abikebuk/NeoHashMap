@@ -2,6 +2,10 @@ package NeoHashMap.Nodes;
 
 import java.util.ArrayList;
 
+/**
+ * Single chained value node class
+ * @param <V> the type of the data
+ */
 public class SingleChainedValueNode<V>{
     /**
      * Data of the node
