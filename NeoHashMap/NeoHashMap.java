@@ -1,7 +1,10 @@
 package NeoHashMap;
 
 import NeoHashMap.Exception.IncompatibleKeyTypeException;
+import NeoHashMap.Exception.InvalidKeyException;
+import NeoHashMap.Exception.InvalidSettingsValue;
 import NeoHashMap.Nodes.AbstractKeyNode;
+import NeoHashMap.Nodes.KeyNode;
 
 import java.util.ArrayList;
 
@@ -32,20 +35,19 @@ public class NeoHashMap<K, V> {
     /**
      * Constructor
      */
-    public NeoHashMap(){
+    public NeoHashMap() throws InvalidSettingsValue {
         this(new NeoHashMapSettings());
-        keys = new ArrayList<K>();
-        nodes = new ArrayList<AbstractKeyNode<K, V>>();
     }
 
     /**
      * Constructor
      * @param settings custom settings
      */
-    NeoHashMap(NeoHashMapSettings settings){
+    public NeoHashMap(NeoHashMapSettings settings) throws InvalidSettingsValue {
         this.settings = settings;
+        keys = new ArrayList<K>();
+        nodes = populatedNodes();
     }
-
 
     /**
      * Getters & Setters
@@ -53,35 +55,52 @@ public class NeoHashMap<K, V> {
 
     /**
      * Add a value in the hashmap
-     * I might be wrong but it felt right to me to put the class
      * @param key
      * @param value
      * @throws Exception
      */
-    public void addValue(K key, V value) throws IncompatibleKeyTypeException {
-        // Switch case doesn't work with
-        if(key instanceof String){
-            addValueWithStringKey((String) key, value);
-        }else{
-            throw new IncompatibleKeyTypeException("Invalid type (only String is available for key type).");
+    public void add(K key, V value) throws IncompatibleKeyTypeException, InvalidKeyException, InvalidSettingsValue {
+        if(key == null) throw new InvalidKeyException("Key value is empty.");
+        HashCode hashCode = new HashCode(key, settings);
+        int hashValue = hashCode.getValue();
+        nodes.get(hashValue).add(hashCode.getRemainder(), value);
+    }
+
+    /**
+     * Methods
+     */
+    public void print(){
+        String prefix = " ";
+        System.out.println("= NeoHashMap =");
+        System.out.println("");
+        System.out.format("Settings : \n");
+        System.out.format(" |         Layers : %s\n", settings.getHashMapLayers());
+        System.out.format(" |       NHM Size : %s\n", settings.getHashMapSize());
+        System.out.format(" |  HashCode Size : %s\n", settings.getHashCodeSize());
+        System.out.format(" |       Overflow : %s\n", settings.canOverflow());
+        System.out.format(" |_______________________________\n", settings.canOverflow());
+        System.out.println("");
+        System.out.println();
+        for(AbstractKeyNode<K, V> n : nodes ){
+            n.print(prefix);
         }
-
     }
-
-    private void addValueWithStringKey(String key, V value){
-
+    /**
+     * Creates the nodes required for the hashmap
+     * @return a list of required nodes
+     * @throws InvalidSettingsValue
+     */
+    private ArrayList<AbstractKeyNode<K, V>> populatedNodes() throws InvalidSettingsValue {
+        ArrayList<AbstractKeyNode<K, V>> result = new ArrayList<AbstractKeyNode<K, V>>(settings.getHashMapSize());
+        for(int i = 0; i < settings.getHashMapSize(); i++){
+             result.add(i, new KeyNode<K, V>(i, settings));
+        }
+        return result;
     }
 
     /**
-     * Common Getter & Setters
+     * Getter & Setters
      */
-
-    /**
-     * Returns the list of keys
-     * @return list of keys
-     */
-    public ArrayList<K> getKeys() { return keys; }
-
 
     /**
      * Return all the values in the node tree left first.
@@ -95,5 +114,56 @@ public class NeoHashMap<K, V> {
         return result;
     }
 
+    /**
+     * Returns node list
+     * @return
+     */
+    public ArrayList<AbstractKeyNode<K, V>> getNodes() {
+        return nodes;
+    }
+
+    /**
+     * Returns the value associated with the key
+     * Returns only the first one in the hashmap cannot overflow
+     * Returns null if no element is found
+     * @param key key
+     * @return
+     */
+    public V getValue(K key){
+        HashCode hashCode = new HashCode(key, settings.getHashCodeSize());
+        return nodes.get(hashCode.getValue()).getValue(hashCode.getRemainder());
+    }
+
+    /**
+     * Returns the values associated with the keys
+     * Returns a empty list if no element is found
+     * @param key key
+     * @return
+     */
+    public ArrayList<V> getValues(K key){
+        HashCode hashCode = new HashCode(key, settings.getHashCodeSize());
+        return nodes.get(hashCode.getValue()).getValues(hashCode.getRemainder());
+    }
+
+
+    /**
+     * Removes the first element associated with the key
+     * Doesn't do anything if there is nothing to remove
+     * @param key
+     */
+    public void removeFirst(String key){
+        HashCode hashCode = new HashCode(key, settings.getHashCodeSize());
+        nodes.get(hashCode.getValue()).removeFirst(hashCode.getRemainder());
+    }
+
+    /**
+     * Removes all the elements associated with the key
+     * Doesn't do anything if there is nothing to remove
+     * @param key
+     */
+    public void removeAll(String key){
+        HashCode hashCode = new HashCode(key, settings.getHashCodeSize());
+        nodes.get(hashCode.getValue()).removeAll(hashCode.getRemainder());
+    }
 }
 
